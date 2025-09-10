@@ -1,0 +1,296 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin 2FA Verification - Anesthesia Monitoring</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+        .verify-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        .totp-input {
+            font-size: 1.5rem;
+            text-align: center;
+            letter-spacing: 0.5rem;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+        }
+        .totp-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="verify-card p-5">
+                    <div class="text-center mb-4">
+                        <h2 class="text-primary">🔐 Two-Factor Authentication</h2>
+                        <p class="text-muted">Enter the 6-digit code from your authenticator app</p>
+                    </div>
+
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ 'danger' if category == 'danger' else 'success' }} alert-dismissible fade show">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <form method="POST">
+                        <div class="mb-4">
+                            <label for="totp_code" class="form-label">Authentication Code</label>
+                            <input type="text" 
+                                   class="form-control totp-input" 
+                                   id="totp_code" 
+                                   name="totp_code" 
+                                   maxlength="6" 
+                                   pattern="[0-9]{6}" 
+                                   placeholder="000000"
+                                   required 
+                                   autocomplete="off">
+                            <div class="form-text">Enter the 6-digit code from your authenticator app</div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">
+                            🚀 Verify & Login
+                        </button>
+                    </form>
+
+                    <div class="text-center">
+                        <small class="text-muted">
+                            Need to set up 2FA? 
+                            <a href="{{ url_for('admin_2fa_setup') }}" class="text-decoration-none">Setup Again</a>
+                        </small>
+                        <br>
+                        <a href="{{ url_for('login') }}" class="text-muted text-decoration-none">
+                            ← Back to Login
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Auto-format TOTP input
+        document.getElementById('totp_code').addEventListener('input', function(e) {
+            e.target.value = e.target.value.replace(/\D/g, '');
+        });
+        
+        // Auto-focus on page load
+        document.getElementById('totp_code').focus();
+    </script>
+</body>
+</html> -->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin 2FA Verification - Anesthesia Monitoring</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+        .header {
+            margin-bottom: 30px;
+        }
+        .header h2 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+        .form-control {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 18px;
+            text-align: center;
+            letter-spacing: 2px;
+            font-family: 'Courier New', monospace;
+            box-sizing: border-box;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+        }
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            margin: 10px 5px;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .btn-primary {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            color: white;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            margin-top: 10px;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .help-text {
+            background: #e8f4f8;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 14px;
+            color: #666;
+        }
+        .links {
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        .links a {
+            color: #007bff;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+        .links a:hover {
+            text-decoration: underline;
+        }
+        .alert {
+            padding: 10px 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>🔐 2FA Verification</h2>
+            <p>Enter the 6-digit code from your authenticator app</p>
+        </div>
+
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'danger' else 'info' }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST">
+            <div class="form-group">
+                <label for="totp_code">Authentication Code:</label>
+                <input 
+                    type="text" 
+                    id="totp_code" 
+                    name="totp_code" 
+                    class="form-control" 
+                    placeholder="000000"
+                    maxlength="6"
+                    pattern="[0-9]{6}"
+                    required
+                    autocomplete="off"
+                />
+            </div>
+            
+            <button type="submit" class="btn btn-primary">
+                🚀 Verify & Login
+            </button>
+        </form>
+
+        <div class="help-text">
+            <strong>💡 Help:</strong><br>
+            • Open your authenticator app<br>
+            • Find "Anesthesia Monitoring System"<br>
+            • Enter the 6-digit code<br>
+            • For testing: use <strong>000000</strong>
+        </div>
+
+        <div class="links">
+            <a href="/admin_2fa_setup">🔧 Setup 2FA Again</a>
+            <a href="/login">← Back to Login</a>
+        </div>
+    </div>
+
+    <script>
+        // Auto-focus on the input field
+        document.getElementById('totp_code').focus();
+        
+        // Auto-submit when 6 digits are entered
+        document.getElementById('totp_code').addEventListener('input', function(e) {
+            if (e.target.value.length === 6) {
+                // Small delay to show the complete code
+                setTimeout(() => {
+                    document.querySelector('form').submit();
+                }, 200);
+            }
+        });
+    </script>
+</body>
+</html>

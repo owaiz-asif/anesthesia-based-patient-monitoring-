@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Integrity Check - Admin Dashboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            color: #333;
+            margin: 0 0 10px 0;
+            font-size: 32px;
+        }
+        .nav-buttons {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        .status-card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-left: 5px solid #007bff;
+            transition: transform 0.3s ease;
+        }
+        .status-card:hover {
+            transform: translateY(-5px);
+        }
+        .status-card.success {
+            border-left-color: #28a745;
+        }
+        .status-card.warning {
+            border-left-color: #ffc107;
+        }
+        .status-card.danger {
+            border-left-color: #dc3545;
+        }
+        .status-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            display: block;
+        }
+        .status-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .status-value {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .status-description {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .success .status-value {
+            color: #28a745;
+        }
+        .warning .status-value {
+            color: #ffc107;
+        }
+        .danger .status-value {
+            color: #dc3545;
+        }
+        .info .status-value {
+            color: #007bff;
+        }
+        .overall-status {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .overall-status.healthy {
+            border: 3px solid #28a745;
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+        }
+        .overall-status.warning {
+            border: 3px solid #ffc107;
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+        }
+        .overall-status.critical {
+            border: 3px solid #dc3545;
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+        }
+        .system-info {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        .info-label {
+            font-weight: 500;
+            color: #555;
+        }
+        .info-value {
+            font-family: 'Courier New', monospace;
+            color: #333;
+            font-weight: bold;
+        }
+        .refresh-btn {
+            margin-top: 20px;
+        }
+        .timestamp {
+            background: #e9ecef;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #666;
+            display: inline-block;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 System Integrity Check</h1>
+            <p>Real-time monitoring of blockchain and database integrity</p>
+            <div class="timestamp">Last Check: {{ status.last_check }} UTC</div>
+        </div>
+
+        <div class="nav-buttons">
+            <a href="/admin_dashboard" class="btn btn-secondary">← Back to Dashboard</a>
+            <!-- <a href="/blockchain_viewer" class="btn btn-primary">🔗 View Blockchain</a> -->
+            <a href="/system_integrity" class="btn btn-success">🔄 Refresh Check</a>
+        </div>
+
+        <!-- Overall System Status -->
+        <div class="overall-status {{ 'healthy' if status.blockchain_valid else 'critical' }}">
+            <div class="status-icon">
+                {{ '✅' if status.blockchain_valid else '❌' }}
+            </div>
+            <h2>
+                {{ 'System Healthy' if status.blockchain_valid else 'System Issues Detected' }}
+            </h2>
+            <p>
+                {{ 'All integrity checks passed successfully' if status.blockchain_valid else 'Blockchain integrity compromised - immediate attention required' }}
+            </p>
+        </div>
+
+        <!-- Detailed Status Cards -->
+        <div class="status-grid">
+            <!-- Blockchain Integrity -->
+            <div class="status-card {{ 'success' if status.blockchain_valid else 'danger' }}">
+                <span class="status-icon">🔗</span>
+                <div class="status-title">Blockchain Integrity</div>
+                <div class="status-value">
+                    {{ '✅ VALID' if status.blockchain_valid else '❌ INVALID' }}
+                </div>
+                <div class="status-description">
+                    {{ 'All blocks verified and chain is intact' if status.blockchain_valid else 'Blockchain chain has been compromised or corrupted' }}
+                </div>
+            </div>
+
+            <!-- Database Patients -->
+            <div class="status-card info">
+                <span class="status-icon">👥</span>
+                <div class="status-title">Patient Records</div>
+                <div class="status-value">{{ status.database_patients }}</div>
+                <div class="status-description">
+                    Total patient records in the database
+                </div>
+            </div>
+
+            <!-- Database Predictions -->
+            <div class="status-card info">
+                <span class="status-icon">🧠</span>
+                <div class="status-title">AI Predictions</div>
+                <div class="status-value">{{ status.database_predictions }}</div>
+                <div class="status-description">
+                    Total AI predictions generated and stored
+                </div>
+            </div>
+
+            <!-- Blockchain Entries -->
+            <div class="status-card info">
+                <span class="status-icon">🔒</span>
+                <div class="status-title">Blockchain Entries</div>
+                <div class="status-value">{{ status.blockchain_entries }}</div>
+                <div class="status-description">
+                    Total encrypted blocks in the blockchain
+                </div>
+            </div>
+        </div>
+
+        <!-- System Information -->
+        <div class="system-info">
+            <h3>📊 System Information</h3>
+            
+            <div class="info-row">
+                <span class="info-label">Blockchain Status:</span>
+                <span class="info-value">
+                    {{ '🟢 Healthy' if status.blockchain_valid else '🔴 Compromised' }}
+                </span>
+            </div>
+            
+            <div class="info-row">
+                <span class="info-label">Database Connection:</span>
+                <span class="info-value">🟢 Connected</span>
+            </div>
+            
+            <div class="info-row">
+                <span class="info-label">Data Synchronization:</span>
+                <span class="info-value">
+                    {{ '🟢 Synchronized' if status.database_predictions <= status.blockchain_entries else '🟡 Partial' }}
+                </span>
+            </div>
+            
+            <div class="info-row">
+                <span class="info-label">Encryption Status:</span>
+                <span class="info-value">🟢 Active (AES-256)</span>
+            </div>
+            
+            <div class="info-row">
+                <span class="info-label">Last Integrity Check:</span>
+                <span class="info-value">{{ status.last_check }}</span>
+            </div>
+            
+            <div class="info-row">
+                <span class="info-label">Total Records Processed:</span>
+                <span class="info-value">{{ status.database_patients + status.database_predictions }}</span>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="text-align: center; margin-top: 30px;">
+            <!-- <a href="/blockchain" class="btn btn-primary" style="margin: 0 10px;">
+                🔗 Examine Blockchain Details
+            </a> -->
+            <a href="/admin_dashboard" class="btn btn-secondary" style="margin: 0 10px;">
+                📊 Return to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Auto-refresh every 30 seconds
+        setTimeout(function() {
+            window.location.reload();
+        }, 30000);
+        
+        // Add visual feedback for status
+        document.addEventListener('DOMContentLoaded', function() {
+            const blockchainValid = {{ 'true' if status.blockchain_valid else 'false' }};
+            
+            if (!blockchainValid) {
+                // Flash warning colors for critical issues
+                setInterval(function() {
+                    document.querySelector('.overall-status.critical').style.opacity = '0.7';
+                    setTimeout(function() {
+                        document.querySelector('.overall-status.critical').style.opacity = '1';
+                    }, 500);
+                }, 2000);
+            }
+        });
+    </script>
+</body>
+</html>

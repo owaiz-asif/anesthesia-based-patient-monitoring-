@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard - Anesthesia Project</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .logo-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+        .container {
+            position: relative;
+            padding-top: 60px; /* space for logo */
+        }
+        .logo-container img {
+            height: 100px;
+            width: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo-container">
+            <img src="{{ url_for('static', filename='images/aethercare_logo.png') }}" alt="AetherCare Logo">
+        </div>
+
+        <h1>Welcome, {{ session.get('username', 'User') }}!</h1>
+        <p>This is your personalized dashboard for managing patient data and predictions.</p>
+
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('vitals_input') }}">Input New Patient Vitals</a></li>
+                <li><a href="{{ url_for('dashboard') }}">View All Predictions</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            </ul>
+        </nav>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flashes">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <p>Use the navigation above to get started.</p>
+    </div>
+</body>
+</html>

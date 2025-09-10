@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Prediction Records</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
+</head>
+<body>
+    <div class="container dashboard-container">
+        <h2>Prediction Dashboard</h2>
+
+        {% if not dashboard_data %}
+            <p>No predictions recorded yet. Please <a href="{{ url_for('vitals_input') }}">enter patient vitals</a> to see data here.</p>
+        {% else %}
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Patient ID</th>
+                            <th>Patient Name</th>
+                            <th>Age</th>
+                            <th>Gender</th>
+                            <th>BP (Systolic)</th>
+                            <th>Heart Rate</th>
+                            <th>SpO2</th>
+                            <th>Temp (°C)</th>
+                            <th>EEG (Hz)</th>
+                            <th>Kidney Disease</th>
+                            <th>Liver Disease</th>
+                            <th>Diabetes</th>
+                            <th>Anesthesia Type</th>
+                            <th>Predicted Dosage (mg)</th>
+                            <th>Dosage Category</th>
+                            <th>Prediction Time</th>
+                            <th>Top Influencing Factors</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in dashboard_data %}
+                        <tr>
+                            <td>{{ entry.patient.id }}</td>
+                            <td>{{ entry.patient.name }}</td>
+                            <td>{{ entry.patient.age }}</td>
+                            <td>{{ entry.patient.gender }}</td>
+                            <td>{{ entry.vitals.bp if entry.vitals else 'N/A' }}</td>
+                            <td>{{ entry.vitals.heart_rate if entry.vitals else 'N/A' }}</td>
+                            <td>{{ entry.vitals.spo2 if entry.vitals else 'N/A' }}</td>
+                            <td>{{ entry.vitals.temperature if entry.vitals else 'N/A' }}</td>
+                            <td>{{ entry.vitals.eeg if entry.vitals else 'N/A' }}</td>
+                            <td>{{ 'Yes' if entry.patient.histories[0].kidney_disease == 1 else 'No' if entry.patient.histories else 'N/A' }}</td>
+                            <td>{{ 'Yes' if entry.patient.histories[0].liver_disease == 1 else 'No' if entry.patient.histories else 'N/A' }}</td>
+                            <td>{{ 'Yes' if entry.patient.histories[0].diabetes == 1 else 'No' if entry.patient.histories else 'N/A' }}</td>
+                            <td>{{ entry.prediction.anesthesia_type_selected }}</td>
+                            <td>{{ entry.prediction.prediction_result }}</td>
+                            <td>{{ entry.prediction.dosage_category }}</td>
+                            <td>{{ entry.prediction.prediction_time.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>
+                                {% if entry.xai %}
+                                    {% set top_features = entry.xai.top_features|from_json %}
+                                    {{ top_features | join(', ') }}
+                                {% else %}
+                                    No XAI Data
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        <p class="navigation-links">
+            <a href="{{ url_for('vitals_input') }}">Enter New Vitals</a> |
+            <a href="{{ url_for('blockchain_viewer') }}">View Blockchain Log</a>
+        </p>
+    </div>
+</body>
+</html>

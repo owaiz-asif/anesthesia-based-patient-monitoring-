@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}BP Analysis{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2>🩺 Blood Pressure Analysis</h2>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-info">
+            <div class="card-body text-center">
+                <h5>Total Readings</h5>
+                <h2>{{ summary.total_readings }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success">
+            <div class="card-body text-center">
+                <h5>Normal BP</h5>
+                <h2>{{ summary.normal_count }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-warning">
+            <div class="card-body text-center">
+                <h5>Elevated BP</h5>
+                <h2>{{ summary.elevated_count }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-danger">
+            <div class="card-body text-center">
+                <h5>Hypertensive</h5>
+                <h2>{{ summary.hypertensive_count }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>📊 Average Values</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Average Systolic:</strong> {{ summary.average_systolic }} mmHg</p>
+                <p><strong>Average Diastolic:</strong> {{ summary.average_diastolic }} mmHg</p>
+                <p><strong>Average Pulse Pressure:</strong> {{ summary.average_pulse_pressure }} mmHg</p>
+                <p><strong>Hypertension Rate:</strong> {{ summary.hypertensive_percentage }}%</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>📈 Recent Readings</h5>
+            </div>
+            <div class="card-body">
+                {% if bp_data %}
+                <div style="max-height: 300px; overflow-y: auto;">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>BP</th>
+                                <th>Category</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for reading in bp_data[:10] %}
+                            <tr>
+                                <td>{{ reading.recorded_at }}</td>
+                                <td>{{ reading.systolic }}/{{ reading.diastolic }}</td>
+                                <td>
+                                    <span class="badge {% if reading.category == 'Hypertensive' %}bg-danger{% elif reading.category == 'Elevated' %}bg-warning{% else %}bg-success{% endif %}">
+                                        {{ reading.category }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">No BP data available</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

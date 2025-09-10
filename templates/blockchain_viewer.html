@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Blockchain Data - Admin Panel</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .blockchain-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        .block-card {
+            background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+        .block-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        .block-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px 12px 0 0;
+            padding: 15px 20px;
+        }
+        .encrypted-data {
+            background: #f8f9fa;
+            border: 1px dashed #6c757d;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: #495057;
+            word-break: break-all;
+        }
+        .hash-display {
+            background: #e9ecef;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            word-break: break-all;
+            border-left: 4px solid #007bff;
+        }
+        .status-badge {
+            position: absolute;
+            top: -10px;
+            right: 20px;
+            z-index: 10;
+        }
+        .security-info {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        .chain-stats {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background: rgba(0,0,0,0.1);">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('admin_dashboard') }}">
+                <i class="fas fa-shield-alt"></i> Admin Panel
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+                <a class="nav-link" href="{{ url_for('system_integrity') }}">System Integrity</a>
+                <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4 mb-5">
+        <div class="blockchain-container p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="text-primary mb-0">
+                        <i class="fas fa-lock"></i> Secure Blockchain Data
+                    </h2>
+                    <p class="text-muted">Encrypted patient data blocks - Admin view only</p>
+                </div>
+                <div class="text-end">
+                    <span class="badge bg-{{ 'success' if is_valid else 'danger' }} fs-6">
+                        <i class="fas fa-{{ 'check-circle' if is_valid else 'exclamation-triangle' }}"></i>
+                        {{ 'Chain Valid' if is_valid else 'Chain Invalid' }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="security-info">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h5><i class="fas fa-info-circle"></i> Security Notice</h5>
+                        <p class="mb-0">
+                            All patient data in this blockchain is encrypted using AES-256 encryption. 
+                            The data shown below represents encrypted blocks that cannot be decrypted without proper authorization keys.
+                            This ensures patient privacy and data integrity.
+                        </p>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="chain-stats text-center">
+                            <h3 class="mb-1">{{ total_blocks }}</h3>
+                            <small>Total Blocks</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                {% for block in chain %}
+                <div class="col-12">
+                    <div class="block-card position-relative">
+                        {% if loop.index0 == 0 %}
+                            <span class="status-badge badge bg-info">Genesis Block</span>
+                        {% else %}
+                            <span class="status-badge badge bg-primary">Block #{{ block.index }}</span>
+                        {% endif %}
+                        
+                        <div class="block-header">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h5 class="mb-1">
+                                        <i class="fas fa-cube"></i> Block {{ block.index }}
+                                    </h5>
+                                    <small class="opacity-75">{{ block.timestamp }}</small>
+                                </div>
+                                <div class="col-md-6 text-end">
+                                    <small class="opacity-75">Data Size: {{ block.data_size }} bytes</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-key"></i> Block Hash</h6>
+                                    <div class="hash-display mb-3">{{ block.hash }}</div>
+                                    
+                                    <h6><i class="fas fa-link"></i> Previous Hash</h6>
+                                    <div class="hash-display mb-3">{{ block.previous_hash }}</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-fingerprint"></i> Data Hash</h6>
+                                    <div class="hash-display mb-3">{{ block.data_hash }}</div>
+                                    
+                                    <h6><i class="fas fa-lock"></i> Encrypted Data Preview</h6>
+                                    <div class="encrypted-data">
+                                        <i class="fas fa-eye-slash text-muted"></i>
+                                        {{ block.encrypted_data }}
+                                        <br><br>
+                                        <small class="text-muted">
+                                            <i class="fas fa-shield-alt"></i> 
+                                            This data is encrypted and cannot be viewed without proper decryption keys.
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="mt-4 p-3 bg-light rounded">
+                <h6><i class="fas fa-info-circle text-primary"></i> Blockchain Integrity Status</h6>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <h4 class="text-{{ 'success' if is_valid else 'danger' }}">
+                                <i class="fas fa-{{ 'check' if is_valid else 'times' }}"></i>
+                            </h4>
+                            <small>Chain Validity</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <h4 class="text-info">{{ total_blocks }}</h4>
+                            <small>Total Blocks</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <h4 class="text-success">
+                                <i class="fas fa-lock"></i>
+                            </h4>
+                            <small>Encrypted</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <h4 class="text-warning">
+                                <i class="fas fa-shield-alt"></i>
+                            </h4>
+                            <small>Secure</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+     <a href="{{ url_for('blockchain_viewer') }}">View Blockchain</a>
+</body>
+</html>

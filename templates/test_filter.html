@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head><title>Test Filter</title></head>
+<body>
+    {% set decoded = json_data | from_json %}
+    <h3>Decoded:</h3>
+    <ul>
+        {% for key, value in decoded.items() %}
+            <li>{{ key }}: {{ value }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

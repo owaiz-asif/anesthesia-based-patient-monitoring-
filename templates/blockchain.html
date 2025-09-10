@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blockchain Log</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
+</head>
+<body>
+    <div class="container blockchain-container">
+        <h2>Blockchain Log</h2>
+        <p>Chain Validity: <span class="{{ 'valid' if is_valid else 'invalid' }}">{{ 'Valid' if is_valid else 'Invalid' }}</span></p>
+
+        {% if not chain %}
+            <p>Blockchain is empty. Make a prediction to add blocks.</p>
+        {% else %}
+            {% for block in chain %}
+                <div class="block-card">
+                    <h4>Block #{{ block.index }}</h4>
+                    <p><strong>Timestamp:</strong> {{ block.timestamp }}</p>
+                    <p><strong>Previous Hash:</strong> <span class="hash">{{ block.previous_hash }}</span></p>
+                    <p><strong>Current Hash:</strong> <span class="hash">{{ block.hash }}</span></p>
+                    <h5>Data:</h5>
+                    <pre class="block-data">{{ block.encrypted_data }}</pre>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <p class="navigation-links">
+            <a href="{{ url_for('vitals_input') }}">Enter New Vitals</a> |
+            <a href="{{ url_for('dashboard') }}">View Prediction Dashboard</a>
+           
+
+        </p>
+    </div>
+</body>
+</html>
+

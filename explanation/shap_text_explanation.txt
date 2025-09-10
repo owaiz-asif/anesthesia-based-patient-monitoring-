@@ -1,0 +1,17 @@
+Sample Input Features:
+{'age': 18.0, 'weight': 53.49285343805664, 'bp_systolic': 121.0, 'heart_rate': 81.0, 'spo2': 91.60848173957746, 'temperature': 38.224130082543915, 'eeg': 31.809672099585686, 'kidney_disease': 1.0, 'liver_disease': 0.0, 'diabetes': 0.0}
+Predicted Dosage: 21.10
+
+Feature Contributions (SHAP Values):
+- age: 0.9117
+- weight: -2.1768
+- bp_systolic: -0.0798
+- heart_rate: 0.0243
+- spo2: -0.4014
+- temperature: 0.0872
+- eeg: -0.1453
+- kidney_disease: -3.4191
+- liver_disease: 1.9520
+- diabetes: 0.2932
+
+Top 3 influencing factors: kidney_disease (decreased), weight (decreased), liver_disease (increased)

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Anesthesia Project</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome, Admin!</h1>
+        <p>This dashboard provides an overview of the system's operational status and data integrity.</p>
+
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('blockchain_viewer') }}">View Blockchain Data</a></li>
+                <li><a href="{{ url_for('system_integrity') }}">Check System Integrity</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            </ul>
+        </nav>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flashes">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <h2>System Statistics</h2>
+        <p>Total Patients: {{ total_patients }}</p>
+        <p>Total Predictions: {{ total_predictions }}</p>
+        <p>Total Blockchain Entries: {{ total_blockchain_entries }}</p>
+
+        <h2>Recent Predictions</h2>
+        {% if recent_predictions %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Prediction ID</th>
+                        <th>Patient ID</th>
+                        <th>Result (mg)</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pred in recent_predictions %}
+                    <tr>
+                        <td>{{ pred.id }}</td>
+                        <td>{{ pred.patient_id }}</td>
+                        <td>{{ pred.prediction_result }}</td>
+                        <td>{{ pred.prediction_time.strftime('%Y-%m-%d %H:%M') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No recent predictions available.</p>
+        {% endif %}
+    </div>
+</body>
+</html>
